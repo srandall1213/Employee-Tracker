@@ -10,7 +10,7 @@ VALUES
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES
-    ("John", "Doe", "Sales Lead", null), ("Mike", "Chan", "Salesperson", 1),
-    ("Ashley", "Rodriguez", "Lead Engineer", null), ("Kevin", "Tupik", "Software Engineer", 3),
-    ("Kunal", "Singh", "Account Manager", null), ("Malia", "Brown", "Accountant", 5),
-    ("Sarah", "Lourd", "Legal Team Lead", null), ("Tom", "Allen", "Lawyer", 7);
+    ("John", "Doe", "Sales Lead", null), ("Mike", "Chan", "Salesperson", "John Doe"),
+    ("Ashley", "Rodriguez", "Lead Engineer", null), ("Kevin", "Tupik", "Software Engineer", "Ashley Rodriguez"),
+    ("Kunal", "Singh", "Account Manager", null), ("Malia", "Brown", "Accountant", "Kunal Singh"),
+    ("Sarah", "Lourd", "Legal Team Lead", null), ("Tom", "Allen", "Lawyer", "Sarah Lourd");

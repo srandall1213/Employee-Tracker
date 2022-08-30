@@ -9,7 +9,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Connect to database
+// Connect to Database
 const db = mysql.createConnection(
     {
       host: 'localhost',
@@ -72,8 +72,7 @@ function startMenu() {
         });
 }
 
-// VIEW FUNCTIONS
-
+// View Functions
 function viewDepts(){
     db.query('SELECT * FROM departments', (err, results) => {
         console.table(results);
@@ -95,8 +94,7 @@ function viewEmps(){
     });
 }
 
-// ADD FUNCTIONS
-
+// Add Functions
 function addDept(){
     inquirer 
         .prompt([
@@ -148,14 +146,47 @@ function addRole(){
 }
 
 function addEmp(){
-    db.query('', (err, results) => {
-        console.table(results);
-        startMenu();
+    db.query("SELECT * FROM roles", (err, results) => {
+        if(err) throw err;
+        inquirer 
+            .prompt([
+                {
+                    name: "firstName",
+                    type: "input",
+                    message: "What is the employee's first name?"
+                },
+                {
+                    name: "lastName",
+                    type: "input",
+                    message: "What is the employee's last name?",
+                },
+                {
+                    name: "role",
+                    type: "list",
+                    message: "What is the employee's role?",
+                    choices: () => {
+                        let roleArr = [];
+                        for (const role of results) {
+                            roleArr.push(role.title)
+                        }
+                        return roleArr;
+                    },
+                    message: "What is the employee's role?"
+                },
+                {
+                    name: "manager",
+                    type: "list",
+                    message: "Who is the employee's manager?",
+                    choices: ["None", "John Doe", "Mike Chan", "Ashley Rodriguez", "Kevin Tupik", "Kunal Singh", "Malia Brown", "Sarah Lourd", "Tom Allen"]
+                }
+            ]).then((response) => {
+                console.log(`➕ Added ${[response.firstName]} ${[response.lastName]} to the database.`),
+                startMenu()
+            });
     });
 }
 
-// UPDATE FUNCTION
-
+// Update Functions
 function updateEmp(){
     db.query('', (err, results) => {
         console.table(results);
@@ -163,7 +194,7 @@ function updateEmp(){
     });
 }
 
-
+// Port Listening
 app.listen(PORT, () => {
     console.log(`\nServer running on port ${PORT} ✨`);
   });  
