@@ -101,24 +101,50 @@ function addDept(){
     inquirer 
         .prompt([
             {
-                name: "departments",
+                name: "department",
                 type: "input",
                 message: "What is the name of the department?"
             }
         ]).then((response) => {
             db.query(
-                'INSERT INTO departments VALUES (DEFAULT, ?)', [response.departments],
-                    console.log(`➕ Added ${[response.departments]} to the database.`),
+                'INSERT INTO departments VALUES (DEFAULT, ?)', [response.department],
+                    console.log(`➕ Added ${[response.department]} to the database.`),
                     startMenu()
             );
         });
 }
 
 function addRole(){
-    db.query('', (err, results) => {
-        console.table(results);
-        startMenu();
-    });
+    inquirer 
+        .prompt([
+            {
+                name: "title",
+                type: "input",
+                message: "What is the name of the role?"
+            },
+            {
+                name: "salary",
+                type: "number",
+                message: "What is the salary of the role?",
+            },
+            {
+                name: "department_id",
+                type: "number",
+                message: "Which department does the role belong to?"
+            }
+
+        ]).then((response) => {
+            db.query(
+                'INSERT INTO roles SET ?', 
+                {
+                    title: response.title,
+                    salary: response.salary,
+                    department_id: response.department_id
+                },
+                console.log(`➕ Added ${[response.title]} to the database.`),
+                startMenu()
+            );
+        });
 }
 
 function addEmp(){
