@@ -9,55 +9,135 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-function beginTracking() {
+// Connect to database
+const db = mysql.createConnection(
+    {
+      host: 'localhost',
+      user: 'root',
+      password: 'Snickerdoodle1!',
+      database: 'employee_db'
+    },
+    
+    console.log("-----------------------"),
+    console.log("| Employee Tracker 🗃️  |"),
+    console.log("-----------------------"),
+    startMenu()
+  );
+
+// Start Employee Tracker
+function startMenu() {
     inquirer
         .prompt([
             {
+
             type: 'list',
             name: 'questions',
             message: 'What would you like to do?',
-            choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Finish']
+            choices: 
+                [
+                'View all departments', 'View all roles', 'View all employees', 
+                'Add a department', 'Add a role', 'Add an employee', 
+                'Update an employee role', 'Finish'
+                ]
             }
         ])
         .then((response) => {
             switch(response.questions){
                 case 'View all departments':
-                    // call view function
+                    viewDepts();
                     break;
                 case 'View all roles':
-                    // call view function 
+                    viewRoles(); 
                     break;
                 case 'View all employees':
-                    // call view function
+                    viewEmps();
                     break;
                 case 'Add a department':
-                    //call add function 
+                    addDept();
                     break;
                 case 'Add a role':
-                    //call add function 
+                    addRole();
                     break;
                 case 'Add an employee':
-                    //call add function 
+                    addEmp();
                     break; 
                 case 'Update an employee role':
-                    //call update function
+                    updateEmp();
                     break;   
                 case 'Finish':
-                    console.log("Finished ✔️")
+                    console.log("---------------")
+                    console.log("| Finished ✔️  |")
+                    console.log("---------------")
             }
         });
 }
-beginTracking();
 
+// VIEW FUNCTIONS
 
+function viewDepts(){
+    db.query('SELECT * FROM departments', (err, results) => {
+        console.table(results);
+        startMenu();
+    });
+}
 
+function viewRoles(){
+    db.query('SELECT * FROM roles', (err, results) => {
+        console.table(results);
+        startMenu();
+    });
+}
 
+function viewEmps(){
+    db.query('SELECT * FROM employees', (err, results) => {
+        console.table(results);
+        startMenu();
+    });
+}
 
+// ADD FUNCTIONS
 
+function addDept(){
+    inquirer 
+        .prompt([
+            {
+                name: "departments",
+                type: "input",
+                message: "What is the name of the department?"
+            }
+        ]).then((response) => {
+            db.query(
+                'INSERT INTO departments VALUES (DEFAULT, ?)', [response.departments],
+                    console.log(`➕ Added ${[response.departments]} to the database.`),
+                    startMenu()
+            );
+        });
+}
 
+function addRole(){
+    db.query('', (err, results) => {
+        console.table(results);
+        startMenu();
+    });
+}
 
+function addEmp(){
+    db.query('', (err, results) => {
+        console.table(results);
+        startMenu();
+    });
+}
+
+// UPDATE FUNCTION
+
+function updateEmp(){
+    db.query('', (err, results) => {
+        console.table(results);
+        startMenu();
+    });
+}
 
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT} 👍`);
+    console.log(`\nServer running on port ${PORT} ✨`);
   });  
