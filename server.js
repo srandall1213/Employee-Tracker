@@ -1,7 +1,6 @@
 const inquirer = require('inquirer');
 const express = require('express');
 const mysql = require('mysql2');
-const { start } = require('repl');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -114,7 +113,9 @@ function addDept(){
 }
 
 function addRole(){
-    inquirer 
+    db.query("SELECT * FROM departments", (err, results) => {
+        if(err) throw err;
+        inquirer 
         .prompt([
             {
                 name: "title",
@@ -128,11 +129,19 @@ function addRole(){
             },
             {
                 name: "department_id",
-                type: "number",
-                message: "Which department does the role belong to?"
+                type: "list",
+                message: "Which department does the role belong to?",
+                choices: () => {
+                    const deptArr = [];
+                    for (const dept of results) {
+                        deptArr.push(dept.name);
+                    }
+                    return deptArr;
+                }
             }
 
         ]).then((response) => {
+            // const assignDept = response.name;
             db.query(
                 'INSERT INTO roles SET ?', 
                 {
@@ -140,10 +149,12 @@ function addRole(){
                     salary: response.salary,
                     department_id: response.department_id
                 },
+                // assignDept,
                 console.log(`➕ Added ${[response.title]} to the database.`),
                 startMenu()
             );
         });
+    });
 }
 
 function addEmp(){
@@ -196,7 +207,7 @@ function addEmp(){
     });
 }
 
-// Update Functions
+// Update Function
 function updateEmp(){
     db.query("SELECT * FROM employees", (err, results) => {
         if(err) throw err;
