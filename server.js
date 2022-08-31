@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const express = require('express');
 const mysql = require('mysql2');
+const { start } = require('repl');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -170,8 +171,7 @@ function addEmp(){
                             roleArr.push(role.title)
                         }
                         return roleArr;
-                    },
-                    message: "What is the employee's role?"
+                    }
                 },
                 {
                     name: "manager",
@@ -179,22 +179,70 @@ function addEmp(){
                     message: "Who is the employee's manager?",
                     choices: ["None", "John Doe", "Mike Chan", "Ashley Rodriguez", "Kevin Tupik", "Kunal Singh", "Malia Brown", "Sarah Lourd", "Tom Allen"]
                 }
+
             ]).then((response) => {
-                console.log(`➕ Added ${[response.firstName]} ${[response.lastName]} to the database.`),
-                startMenu()
+                db.query(
+                    'INSERT INTO employees SET ?', 
+                    {
+                        first_name: response.firstName,
+                        last_name: response.lastName,
+                        role_id: response.role,
+                        manager_id: response.manager
+                    },
+                    console.log(`➕ Added ${[response.firstName]} ${[response.lastName]} to the database.`),
+                    startMenu()
+                );
             });
     });
 }
 
 // Update Functions
 function updateEmp(){
-    db.query('', (err, results) => {
-        console.table(results);
-        startMenu();
-    });
+    db.query("SELECT * FROM employees", (err, results) => {
+        if(err) throw err;
+        inquirer 
+        .prompt([
+            {
+                name: "name",
+                type: "list",
+                message: "Which employee's role do you want to update?",
+                choices: () => {
+                    const lastNameArr = [];
+                    for (const lastName of results) {
+                        lastNameArr.push(lastName.last_name);
+                    }
+                    return lastNameArr;
+                }
+            },
+            {
+                name: "title",
+                type: "list",
+                message: "Which role do you want to assign the selected employee?",
+                choices: () => {
+                    const roleArr = [];
+                    for (const role of results) {
+                        roleArr.push(role.role_id);
+                    }
+                    return roleArr;
+                }
+            }
+        ]).then((response) => {
+            let lastName = response.name;
+            db.query(
+                "UPDATE employees SET ? WHERE last_name = ?",
+                [
+                    {
+                        role_id: response.title
+                    }, lastName
+                ],
+                console.log(`⬆️  Updated ${lastName }'s role to ${response.title}.`),
+                startMenu()
+            );
+        });
+    });           
 }
 
 // Port Listening
 app.listen(PORT, () => {
     console.log(`\nServer running on port ${PORT} ✨`);
-  });  
+});

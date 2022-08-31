@@ -14,3 +14,4 @@ VALUES
     ("Ashley", "Rodriguez", "Lead Engineer", null), ("Kevin", "Tupik", "Software Engineer", "Ashley Rodriguez"),
     ("Kunal", "Singh", "Account Manager", null), ("Malia", "Brown", "Accountant", "Kunal Singh"),
     ("Sarah", "Lourd", "Legal Team Lead", null), ("Tom", "Allen", "Lawyer", "Sarah Lourd");
+    
