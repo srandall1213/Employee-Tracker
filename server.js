@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const express = require('express');
 const mysql = require('mysql2');
+const cTable = require('console.table');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -74,21 +75,21 @@ function startMenu() {
 
 // View Functions
 function viewDepts(){
-    db.query('SELECT * FROM departments', (err, results) => {
+    db.query('SELECT departments.id AS ID, departments.name AS Name FROM departments', (err, results) => {
         console.table(results);
         startMenu();
     });
 }
 
 function viewRoles(){
-    db.query('SELECT * FROM roles', (err, results) => {
+    db.query('SELECT roles.id AS ID, roles.title AS Title, roles.department_id AS Department, roles.salary AS Salary FROM roles', (err, results) => {
         console.table(results);
         startMenu();
     });
 }
 
 function viewEmps(){
-    db.query('SELECT * FROM employees', (err, results) => {
+    db.query("SELECT employees.id AS ID, employees.first_name AS First, employees.last_name as Last, employees.role_id AS Title, employees.manager_id AS Manager, roles.salary AS Salary, roles.department_id AS Department FROM employees JOIN roles ON employees.role_id = roles.id", (err, results) => {
         console.table(results);
         startMenu();
     });
@@ -106,14 +107,14 @@ function addDept(){
         ]).then((response) => {
             db.query(
                 'INSERT INTO departments VALUES (DEFAULT, ?)', [response.department],
-                    console.log(`➕ Added ${[response.department]} to the database.`),
+                    console.log(`➕ Added ${response.department} to the database.`),
                     startMenu()
             );
         });
 }
 
 function addRole(){
-    db.query("SELECT * FROM departments", (err, results) => {
+    db.query("SELECT * FROM roles", (err, results) => {
         if(err) throw err;
         inquirer 
         .prompt([
@@ -134,14 +135,13 @@ function addRole(){
                 choices: () => {
                     const deptArr = [];
                     for (const dept of results) {
-                        deptArr.push(dept.name);
+                        deptArr.push(dept.department_id);
                     }
                     return deptArr;
                 }
             }
 
         ]).then((response) => {
-            // const assignDept = response.name;
             db.query(
                 'INSERT INTO roles SET ?', 
                 {
@@ -149,8 +149,8 @@ function addRole(){
                     salary: response.salary,
                     department_id: response.department_id
                 },
-                // assignDept,
-                console.log(`➕ Added ${[response.title]} to the database.`),
+                
+                console.log(`➕ Added ${response.title} to the database.`),
                 startMenu()
             );
         });
@@ -179,7 +179,7 @@ function addEmp(){
                     choices: () => {
                         let roleArr = [];
                         for (const role of results) {
-                            roleArr.push(role.title)
+                            roleArr.push(role.id)
                         }
                         return roleArr;
                     }
@@ -188,7 +188,8 @@ function addEmp(){
                     name: "manager",
                     type: "list",
                     message: "Who is the employee's manager?",
-                    choices: ["None", "John Doe", "Mike Chan", "Ashley Rodriguez", "Kevin Tupik", "Kunal Singh", "Malia Brown", "Sarah Lourd", "Tom Allen"]
+                    choices: [1, 3, 5, 7]
+                    // choices: ["None", "John Doe", "Mike Chan", "Ashley Rodriguez", "Kevin Tupik", "Kunal Singh", "Malia Brown", "Sarah Lourd", "Tom Allen"]
                 }
 
             ]).then((response) => {
@@ -200,7 +201,7 @@ function addEmp(){
                         role_id: response.role,
                         manager_id: response.manager
                     },
-                    console.log(`➕ Added ${[response.firstName]} ${[response.lastName]} to the database.`),
+                    console.log(`➕ Added ${response.firstName} ${response.lastName} to the database.`),
                     startMenu()
                 );
             });
@@ -246,7 +247,7 @@ function updateEmp(){
                         role_id: response.title
                     }, lastName
                 ],
-                console.log(`⬆️  Updated ${lastName }'s role to ${response.title}.`),
+                console.log(`⬆️  Updated ${lastName}'s role to ${response.title}.`),
                 startMenu()
             );
         });
