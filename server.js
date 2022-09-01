@@ -91,7 +91,8 @@ function viewRoles(){
 }
 
 function viewEmps(){
-    db.query("SELECT employees.id AS ID, employees.first_name AS First, employees.last_name as Last, roles.title AS Title, employees.manager_id AS Manager, roles.salary AS Salary, departments.name AS Department FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id", (err, results) => {
+    db.query(
+        "SELECT employees.id AS ID, employees.first_name AS First, employees.last_name as Last, roles.title AS Title, roles.salary AS Salary, departments.name AS Department, employees.manager_id AS Manager FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id", (err, results) => {
         if(err) throw err;
         console.table(results);
         startMenu();
