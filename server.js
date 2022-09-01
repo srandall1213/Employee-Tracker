@@ -76,20 +76,23 @@ function startMenu() {
 // View Functions
 function viewDepts(){
     db.query('SELECT departments.id AS ID, departments.name AS Name FROM departments', (err, results) => {
+        if(err) throw err;
         console.table(results);
         startMenu();
     });
 }
 
 function viewRoles(){
-    db.query('SELECT roles.id AS ID, roles.title AS Title, roles.department_id AS Department, roles.salary AS Salary FROM roles', (err, results) => {
+    db.query('SELECT roles.id AS ID, roles.title AS Title, roles.salary AS Salary, departments.name AS Department FROM roles JOIN departments ON roles.department_id = departments.id', (err, results) => {
+        if(err) throw err;
         console.table(results);
         startMenu();
     });
 }
 
 function viewEmps(){
-    db.query("SELECT employees.id AS ID, employees.first_name AS First, employees.last_name as Last, employees.role_id AS Title, employees.manager_id AS Manager, roles.salary AS Salary, roles.department_id AS Department FROM employees JOIN roles ON employees.role_id = roles.id", (err, results) => {
+    db.query("SELECT employees.id AS ID, employees.first_name AS First, employees.last_name as Last, roles.title AS Title, employees.manager_id AS Manager, roles.salary AS Salary, departments.name AS Department FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id", (err, results) => {
+        if(err) throw err;
         console.table(results);
         startMenu();
     });
@@ -114,7 +117,7 @@ function addDept(){
 }
 
 function addRole(){
-    db.query("SELECT * FROM roles", (err, results) => {
+    db.query("SELECT * FROM departments", (err, results) => {
         if(err) throw err;
         inquirer 
         .prompt([
@@ -129,13 +132,13 @@ function addRole(){
                 message: "What is the salary of the role?",
             },
             {
-                name: "department_id",
+                name: "name",
                 type: "list",
                 message: "Which department does the role belong to?",
                 choices: () => {
                     const deptArr = [];
                     for (const dept of results) {
-                        deptArr.push(dept.department_id);
+                        deptArr.push(dept.name);
                     }
                     return deptArr;
                 }
@@ -147,12 +150,22 @@ function addRole(){
                 {
                     title: response.title,
                     salary: response.salary,
-                    department_id: response.department_id
-                },
-                
-                console.log(`➕ Added ${response.title} to the database.`),
-                startMenu()
+                    // department_id: () => { 
+                    //     switch(response.name) {
+                    //         case 'Sales':
+                    //             return 1;
+                    //         case 'Engineering':
+                    //             return 2;
+                    //         case 'Finance':
+                    //             return 3;
+                    //         case 'Legal':
+                    //             return 4;
+                    //     }
+                    // }
+                }
             );
+            console.log(`➕ Added ${response.title} to the database.`),
+            startMenu()
         });
     });
 }
