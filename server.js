@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 const express = require('express');
 const mysql = require('mysql2');
 const cTable = require('console.table');
+const { concat } = require('rxjs');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -92,7 +93,7 @@ function viewRoles(){
 
 function viewEmps(){
     db.query(
-        "SELECT employees.id AS ID, employees.first_name AS First, employees.last_name as Last, roles.title AS Title, roles.salary AS Salary, departments.name AS Department, employees.manager_id AS Manager FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id", (err, results) => {
+        "SELECT employees.id AS ID, employees.first_name AS First, employees.last_name as Last, roles.title AS Title, roles.salary AS Salary, departments.name AS Departments, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN departments ON roles.department_id = departments.id LEFT JOIN employees manager ON manager.id = employees.manager_id", (err, results) => {
         if(err) throw err;
         console.table(results);
         startMenu();
@@ -133,13 +134,13 @@ function addRole(){
                 message: "What is the salary of the role?",
             },
             {
-                name: "name",
+                name: "dept",
                 type: "list",
-                message: "Which department does the role belong to?",
+                message: "Which department ID does the role belong to?",
                 choices: () => {
                     const deptArr = [];
                     for (const dept of results) {
-                        deptArr.push(dept.name);
+                        deptArr.push(dept.id);
                     }
                     return deptArr;
                 }
@@ -151,22 +152,14 @@ function addRole(){
                 {
                     title: response.title,
                     salary: response.salary,
-                    // department_id: () => { 
-                    //     switch(response.name) {
-                    //         case 'Sales':
-                    //             return 1;
-                    //         case 'Engineering':
-                    //             return 2;
-                    //         case 'Finance':
-                    //             return 3;
-                    //         case 'Legal':
-                    //             return 4;
-                    //     }
-                    // }
+                    department_id: response.dept
+                },
+                function(err) {
+                    if(err) throw err;
+                    console.log(`➕ Added ${response.title} to the database.`),
+                    startMenu()
                 }
-            );
-            console.log(`➕ Added ${response.title} to the database.`),
-            startMenu()
+            ); 
         });
     });
 }
@@ -197,6 +190,7 @@ function addEmp(){
                         }
                         return roleArr;
                     }
+                    //try to dynamically show the roles as strings, but send them in the response as integers
                 },
                 {
                     name: "manager",
@@ -233,11 +227,12 @@ function updateEmp(){
                 type: "list",
                 message: "Which employee's role do you want to update?",
                 choices: () => {
-                    const lastNameArr = [];
-                    for (const lastName of results) {
-                        lastNameArr.push(lastName.last_name);
+
+                    const nameArr = [];
+                    for (const lastName of results){
+                        nameArr.push(lastName.last_name);
                     }
-                    return lastNameArr;
+                    return nameArr;
                 }
             },
             {
@@ -261,7 +256,7 @@ function updateEmp(){
                         role_id: response.title
                     }, lastName
                 ],
-                console.log(`⬆️  Updated ${lastName}'s role to ${response.title}.`),
+                console.log(`⬆️  Updated ${lastName}'s role.`),
                 startMenu()
             );
         });
