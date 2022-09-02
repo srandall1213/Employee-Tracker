@@ -6,12 +6,12 @@ My motivation in completing this project was to apply what I learned this week a
 
 ## Future Development
 
-In the future, I would like to figure out how to show strings as choices in Inquirer when adding/updating an employee while using that response to update the database. Right now, some of the choices are integers so that I can update my table correctly. There is also one question that only shows last names of employees as choices. I would also like to figure out how to concatenate the names to display as full names. 
+In the future, I would like to figure out how to show strings as choices in Inquirer when adding/updating an employee while using that response to update the database. Right now, some of the choices are integers so that I can update my table correctly. There is also one question that only shows last names of employees as choices. I would like to figure out how to concatenate the names to display as full names. 
 
 The following nested questions need adjustments: 
-- Add a role>Which department does the role belong to?
-- Add an employee>What is the employee's role? AND Who is the employee's manager?
-- Update an employee role>Which employee's role do you want to update?  AND Which role do you want to assign the selected employee?
+- Add a role>Which department ID does the role belong to?
+- Add an employee>What is the employee's role ID? AND What is the employee's manager ID?
+- Update an employee role>Which employee's role do you want to update? AND Which role ID do you want to assign the selected employee?
 
 
 ## Application Appearance
