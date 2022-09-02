@@ -2,7 +2,6 @@ const inquirer = require('inquirer');
 const express = require('express');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-const { concat } = require('rxjs');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -182,7 +181,7 @@ function addEmp(){
                 {
                     name: "role",
                     type: "list",
-                    message: "What is the employee's role?",
+                    message: "What is employee's role ID?",
                     choices: () => {
                         let roleArr = [];
                         for (const role of results) {
@@ -190,14 +189,12 @@ function addEmp(){
                         }
                         return roleArr;
                     }
-                    //try to dynamically show the roles as strings, but send them in the response as integers
                 },
                 {
                     name: "manager",
                     type: "list",
-                    message: "Who is the employee's manager?",
-                    choices: [1, 3, 5, 7]
-                    // choices: ["None", "John Doe", "Mike Chan", "Ashley Rodriguez", "Kevin Tupik", "Kunal Singh", "Malia Brown", "Sarah Lourd", "Tom Allen"]
+                    message: "What is the employee's manager ID?",
+                    choices: [1, 2, 3, 4]
                 }
 
             ]).then((response) => {
@@ -238,7 +235,7 @@ function updateEmp(){
             {
                 name: "title",
                 type: "list",
-                message: "Which role do you want to assign the selected employee?",
+                message: "Which role ID do you want to assign the selected employee?",
                 choices: () => {
                     const roleArr = [];
                     for (const role of results) {
